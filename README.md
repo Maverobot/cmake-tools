@@ -1,4 +1,4 @@
-# cmake_tools
+# cmake-tools
 This package provides automatic configuration of following tools for cmake project:
 * clang-format
 * clang-tidy
