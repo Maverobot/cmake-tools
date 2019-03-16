@@ -21,12 +21,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/ClangTools.cmake OPTIONAL
   RESULT_VARIABLE CLANG_TOOLS
 )
 if(CLANG_TOOLS)
-  file(GLOB_RECURSE SOURCES
-    ${GLOB_SOURCES}
-  )
-  file(GLOB_RECURSE HEADERS
-    ${GLOB_HEADERS}
-  )
+  ${GLOB_SOURCE_SNIPPET}
+  ${GLOB_HEADER_SNIPPET}
   add_format_target(${PROJECT_NAME} FILES ${SOURCES} ${HEADERS})
   add_tidy_target(${PROJECT_NAME}
     FILES ${SOURCES}
@@ -34,6 +30,13 @@ if(CLANG_TOOLS)
   )
 endif()
 `
+
+const sourceSnippetTemplate = `file(GLOB_RECURSE SOURCES
+    $${GLOB_SOURCES}
+  )`
+const headerSnippetTemplate = `file(GLOB_RECURSE HEADERS
+    $${GLOB_HEADERS}
+  )`
 
 func main() {
 	listFilePath := flag.String("path", "", "path to a CMakeLists.txt file")
@@ -78,8 +81,22 @@ func getTemplate(listFilePath string) string {
 	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
 	headerConfArray := getGlobConfArray(headerRelDirs, "h")
 
-	output := replaceString(template, `\$\{GLOB_SOURCES\}`, strings.Join(srcConfArray, "\n    "))
-	output = replaceString(output, `\$\{GLOB_HEADERS\}`, strings.Join(headerConfArray, "\n    "))
+	// Get source and header snippets
+	sourceSnippet := ""
+	if len(srcConfArray) != 0 {
+		sourceSnippet = replaceString(sourceSnippetTemplate,
+			`\$\{GLOB_SOURCES\}`,
+			strings.Join(srcConfArray, "\n    "))
+	}
+	headerSnippet := ""
+	if len(headerConfArray) != 0 {
+		headerSnippet = replaceString(headerSnippetTemplate,
+			`\$\{GLOB_HEADERS\}`,
+			strings.Join(headerConfArray, "\n    "))
+	}
+
+	output := replaceString(template, `\$\{GLOB_SOURCE_SNIPPET\}`, sourceSnippet)
+	output = replaceString(output, `\$\{GLOB_HEADER_SNIPPET\}`, headerSnippet)
 
 	// Puts project name into output
 	output = replaceString(output, `\$\{PROJECT_NAME\}`, <-projectName)
