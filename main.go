@@ -20,10 +20,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ClangTools.cmake OPTIONAL
 )
 if(CLANG_TOOLS)
   file(GLOB_RECURSE SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+    ${GLOB_SOURCES}
+  )
   file(GLOB_RECURSE HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${GLOB_HEADERS}
   )
   add_format_target(${PROJECT_NAME} FILES ${SOURCES} ${HEADERS})
   add_tidy_target(${PROJECT_NAME}
@@ -65,17 +65,32 @@ func getTemplate(listFilePath string) string {
 	// Find project name
 	go findProjectName(string(contentList), projectName)
 
+	rootDir := filepath.Dir(listFilePath)
+
 	// Find source folder paths
-	findSourceDirs(filepath.Dir(listFilePath))
+	srcAbsDirs := findSourceDirs(rootDir)
+	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
 
 	// Find header folder paths
-	findHeaderDirs(filepath.Dir(listFilePath))
+	headerAbsDirs := findHeaderDirs(rootDir)
+	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
 
-	// Puts project name into template
-	newTemplate := replaceString(template, `\$\{PROJECT_NAME\}`, <-projectName)
+	// Print relative paths
+	// fmt.Printf("src dirs: %v\n", srcRelDirs)
+	// fmt.Printf("header dirs: %v\n", headerRelDirs)
 
-	// Puts project name into template
-	return replaceString(newTemplate, `\$\{TARGETS\}`, strings.Join(<-targets, " "))
+	// Get source glob config
+	srcConfArray := getGlobConfArray(srcRelDirs, "cpp")
+	headerConfArray := getGlobConfArray(headerRelDirs, "h")
+
+	output := replaceString(template, `\$\{GLOB_SOURCES\}`, strings.Join(srcConfArray, "\n    "))
+	output = replaceString(output, `\$\{GLOB_HEADERS\}`, strings.Join(headerConfArray, "\n    "))
+
+	// Puts project name into output
+	output = replaceString(output, `\$\{PROJECT_NAME\}`, <-projectName)
+
+	// Puts project name into output
+	return replaceString(output, `\$\{TARGETS\}`, strings.Join(<-targets, " "))
 }
 
 // findLibraryNames finds the names of libraries and executables defined
@@ -149,4 +164,23 @@ func findAllMatchDirs(path string, pattern string) []string {
 		i++
 	}
 	return dirs
+}
+
+func getRootChildren(rootDir string, absDirs []string) []string {
+	relDirs := make([]string, len(absDirs))
+	for i, absDir := range absDirs {
+		tmp := strings.Replace(absDir, rootDir, "", 1)
+		dirs := strings.Split(tmp, `/`)
+		relDirs[i] = dirs[1]
+	}
+	return relDirs
+}
+
+func getGlobConfArray(folderNames []string, ext string) []string {
+	template := `$${CMAKE_CURRENT_SOURCE_DIR}/%s/*.%s`
+	conf := make([]string, len(folderNames))
+	for i, v := range folderNames {
+		conf[i] = fmt.Sprintf(template, v, ext)
+	}
+	return conf
 }
