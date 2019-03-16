@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	survey "gopkg.in/AlecAivazis/survey.v1"
 )
 
 const startSize = 8
@@ -34,18 +36,13 @@ endif()
 `
 
 func main() {
-
 	listFilePath := flag.String("path", "", "path to a CMakeLists.txt file")
-
 	flag.Parse()
-
 	if len(os.Args) < 2 || len(*listFilePath) == 0 {
 		flag.Usage()
 		return
 	}
-
 	newTemplate := getTemplate(*listFilePath)
-
 	fmt.Print(newTemplate)
 }
 
@@ -69,18 +66,16 @@ func getTemplate(listFilePath string) string {
 
 	// Find source folder paths
 	srcAbsDirs := findSourceDirs(rootDir)
-	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
+	srcAbsDirs = userFilterOptions("source filter", "Press space key to select your source folder: \n", srcAbsDirs)
 
 	// Find header folder paths
 	headerAbsDirs := findHeaderDirs(rootDir)
-	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
-
-	// Print relative paths
-	// fmt.Printf("src dirs: %v\n", srcRelDirs)
-	// fmt.Printf("header dirs: %v\n", headerRelDirs)
+	headerAbsDirs = userFilterOptions("header filter", "Press space key to select your header folder: \n", headerAbsDirs)
 
 	// Get source glob config
+	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
 	srcConfArray := getGlobConfArray(srcRelDirs, "cpp")
+	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
 	headerConfArray := getGlobConfArray(headerRelDirs, "h")
 
 	output := replaceString(template, `\$\{GLOB_SOURCES\}`, strings.Join(srcConfArray, "\n    "))
@@ -183,4 +178,26 @@ func getGlobConfArray(folderNames []string, ext string) []string {
 		conf[i] = fmt.Sprintf(template, v, ext)
 	}
 	return conf
+}
+
+func createQuestion(name string, message string, options []string) []*survey.Question {
+	return []*survey.Question{
+		{
+			Name: name,
+			Prompt: &survey.MultiSelect{
+				Message: message,
+				Options: options,
+			},
+		},
+	}
+}
+
+func userFilterOptions(name string, info string, src []string) []string {
+	answers := []string{}
+	question := createQuestion(name, info, src)
+	err := survey.Ask(question[:], &answers)
+	if err != nil {
+		panic(err)
+	}
+	return answers
 }
