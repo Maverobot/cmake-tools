@@ -15,7 +15,7 @@ const startSize = 8
 
 const template = `
 ## ClangTools
-include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ClangTools.cmake OPTIONAL
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/ClangTools.cmake OPTIONAL
   RESULT_VARIABLE CLANG_TOOLS
 )
 if(CLANG_TOOLS)
