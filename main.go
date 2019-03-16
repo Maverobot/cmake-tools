@@ -44,14 +44,6 @@ func main() {
 		return
 	}
 
-	//  ex, err := os.Executable()
-	//  if err != nil {
-	//  	panic(err)
-	//  }
-
-	//	exPath := filepath.Dir(ex)
-	//	fmt.Println(exPath)
-
 	newTemplate := getTemplate(*listFilePath)
 
 	fmt.Print(newTemplate)
