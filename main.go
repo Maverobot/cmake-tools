@@ -187,6 +187,7 @@ func createQuestion(name string, message string, options []string) []*survey.Que
 			Prompt: &survey.MultiSelect{
 				Message: message,
 				Options: options,
+				Default: options,
 			},
 		},
 	}
