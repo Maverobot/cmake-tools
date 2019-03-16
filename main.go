@@ -76,6 +76,9 @@ func getTemplate(listFilePath string) string {
 	// Find source folder paths
 	findSourceDirs(filepath.Dir(listFilePath))
 
+	// Find header folder paths
+	findHeaderDirs(filepath.Dir(listFilePath))
+
 	// Puts project name into template
 	newTemplate := replaceString(template, `\$\{PROJECT_NAME\}`, <-projectName)
 
@@ -116,18 +119,18 @@ func replaceString(src string, pattern string, repl string) string {
 
 // findSourceDirs finds the folder paths of cpp files in cmake project
 func findSourceDirs(path string) []string {
-	pattern := ".cpp$"
-	return getParentPathsExt(path, pattern)
+	pattern := `\.cpp$`
+	return findAllMatchDirs(path, pattern)
 }
 
 // findHeaderDirs finds the folder paths of h/hpp files in cmake project
-func findHeaderDirs() []string {
-	dirs := make([]string, 0, startSize)
-	return dirs
+func findHeaderDirs(path string) []string {
+	pattern := `\.h$`
+	return findAllMatchDirs(path, pattern)
 }
 
-func getParentPathsExt(path string, pattern string) []string {
-	dirs := make([]string, 0)
+func findAllMatchDirs(path string, pattern string) []string {
+	dirMap := make(map[string]struct{})
 	r := regexp.MustCompile(pattern)
 
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
@@ -135,13 +138,23 @@ func getParentPathsExt(path string, pattern string) []string {
 			log.Fatal(err)
 		}
 		if r.MatchString(path) {
-			dirs = append(dirs, filepath.Dir(path))
-			fmt.Println(filepath.Dir(path))
+			dir := filepath.Dir(path)
+			if _, ok := dirMap[dir]; !ok {
+				dirMap[dir] = struct{}{}
+			} else {
+			}
 		}
 		return nil
 	})
 	if err != nil {
 		panic(err)
+	}
+
+	dirs := make([]string, len(dirMap))
+	i := 0
+	for key := range dirMap {
+		dirs[i] = key
+		i++
 	}
 	return dirs
 }
