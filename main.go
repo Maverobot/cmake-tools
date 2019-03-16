@@ -125,7 +125,7 @@ func findSourceDirs(path string) []string {
 
 // findHeaderDirs finds the folder paths of h/hpp files in cmake project
 func findHeaderDirs(path string) []string {
-	pattern := `\.h$`
+	pattern := `\.(?:h|hpp)$`
 	return findAllMatchDirs(path, pattern)
 }
 
