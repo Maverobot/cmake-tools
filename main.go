@@ -66,11 +66,11 @@ func getTemplate(listFilePath string) string {
 
 	// Find source folder paths
 	srcAbsDirs := findSourceDirs(rootDir)
-	srcAbsDirs = userFilterOptions("source filter", "Press space key to select your source folder: \n", srcAbsDirs)
+	srcAbsDirs = userFilterOptions("source filter", "Verify your source folder(s): \n", srcAbsDirs)
 
 	// Find header folder paths
 	headerAbsDirs := findHeaderDirs(rootDir)
-	headerAbsDirs = userFilterOptions("header filter", "Press space key to select your header folder: \n", headerAbsDirs)
+	headerAbsDirs = userFilterOptions("header filter", "Verify your header folder(s): \n", headerAbsDirs)
 
 	// Get source glob config
 	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
