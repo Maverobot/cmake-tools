@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	prompt "github.com/c-bata/go-prompt"
+	"github.com/fatih/color"
 	survey "gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -50,15 +51,17 @@ func main() {
 	fmt.Print(newTemplate)
 
 	// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
-	ex, err := os.Executable()
+	d := color.New(color.FgGreen, color.Bold)
+	_, err := d.Printf("? ")
+	d = color.New(color.FgWhite, color.Bold)
+	_, err = d.Printf("Please type the path to cmake-tools: \n")
 	if err != nil {
 		panic(err)
 	}
-	exPath := filepath.Dir(ex)
-	fmt.Println(exPath)
 
+	// Path autocompletion
 	var options []string
-	options = append(options, exPath)
+	options = append(options, getExecPath())
 	t := prompt.Input("> ", createCompleter(options))
 	fmt.Println("You selected " + t)
 }
@@ -268,17 +271,25 @@ func createCompleter(textList []string) prompt.Completer {
 	completer := func(d prompt.Document) []prompt.Suggest {
 		var s []prompt.Suggest
 		for _, value := range textList {
-			s = append(s, prompt.Suggest{Text: value, Description: "placeholder"})
+			s = append(s, prompt.Suggest{Text: value, Description: ""})
 		}
 
 		children := getSuggestionsPath(d.GetWordBeforeCursor())
 
 		for _, value := range children {
-			s = append(s, prompt.Suggest{Text: value, Description: "path"})
+			s = append(s, prompt.Suggest{Text: value, Description: ""})
 		}
 
 		return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 	}
 
 	return completer
+}
+
+func getExecPath() string {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Dir(ex)
 }
