@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	prompt "github.com/c-bata/go-prompt"
 	survey "gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -47,6 +48,19 @@ func main() {
 	}
 	newTemplate := getTemplate(*listFilePath)
 	fmt.Print(newTemplate)
+
+	// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
+	fmt.Println(exPath)
+
+	var options []string
+	options = append(options, exPath)
+	t := prompt.Input("> ", createCompleter(options))
+	fmt.Println("You selected " + t)
 }
 
 func getTemplate(listFilePath string) string {
@@ -197,7 +211,7 @@ func getGlobConfArray(folderNames []string, ext string) []string {
 	return conf
 }
 
-func createQuestion(name string, message string, options []string) []*survey.Question {
+func createMultiSelectQuestion(name string, message string, options []string) []*survey.Question {
 	return []*survey.Question{
 		{
 			Name: name,
@@ -212,10 +226,59 @@ func createQuestion(name string, message string, options []string) []*survey.Que
 
 func userFilterOptions(name string, info string, src []string) []string {
 	answers := []string{}
-	question := createQuestion(name, info, src)
+	question := createMultiSelectQuestion(name, info, src)
 	err := survey.Ask(question[:], &answers)
 	if err != nil {
 		panic(err)
 	}
 	return answers
+}
+
+func getSuggestionsPath(path string) []string {
+	// remove the letters after and inclusive the last "/"
+	var re = regexp.MustCompile(`\w*$`)
+	path = re.ReplaceAllString(path, ``)
+
+	info, err := os.Stat(path)
+	if err != nil {
+		return []string{}
+	}
+
+	var children []string
+	if info.IsDir() {
+		files, err := ioutil.ReadDir(path)
+		if err != nil {
+			return []string{}
+		}
+		// Strip "/" at the end of path
+		if strings.HasSuffix(path, "/") {
+			path = path[0 : len(path)-1]
+		}
+
+		for _, file := range files {
+			children = append(children, path+"/"+file.Name())
+		}
+	}
+
+	return children
+}
+
+func createCompleter(textList []string) prompt.Completer {
+
+	completer := func(d prompt.Document) []prompt.Suggest {
+		var s []prompt.Suggest
+		for _, value := range textList {
+			s = append(s, prompt.Suggest{Text: value, Description: "placeholder"})
+		}
+
+		children := getSuggestionsPath(d.GetWordBeforeCursor())
+
+		for _, value := range children {
+			s = append(s, prompt.Suggest{Text: value, Description: "path"})
+		}
+
+		return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
+	}
+
+	return completer
 }
