@@ -64,6 +64,12 @@ func main() {
 	options = append(options, getExecPath())
 	t := prompt.Input("> ", createCompleter(options))
 	fmt.Println("You selected " + t)
+
+	if _, err := os.Stat(t); !os.IsNotExist(err) {
+		fmt.Println(t + " is a path.")
+	} else {
+		fmt.Println(t + " is not a path.")
+	}
 }
 
 func getTemplate(listFilePath string) string {
