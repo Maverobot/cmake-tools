@@ -43,6 +43,8 @@ const headerSnippetTemplate = `file(GLOB_RECURSE HEADERS
     $${GLOB_HEADERS}
   )`
 
+var configFileNames = [3]string{".clang-format", ".clang-tidy", "cmake/ClangTools.cmake"}
+
 func main() {
 	listFilePath := flag.String("path", "", "path to a CMakeLists.txt file")
 	flag.Parse()
@@ -65,14 +67,29 @@ func main() {
 	// Path autocompletion
 	var options []string
 	options = append(options, getExecPath())
-	t := prompt.Input("> ", createCompleter(options))
-	fmt.Println("You selected " + t)
+	srcDir := prompt.Input("> ", createCompleter(options))
+	fmt.Println("You selected " + srcDir)
 
-	if _, err := os.Stat(t); !os.IsNotExist(err) {
-		fmt.Println(t + " is a path.")
+	if _, err := os.Stat(srcDir); !os.IsNotExist(err) {
+		fmt.Println(srcDir + " is a path.")
 	} else {
-		fmt.Println(t + " is not a path.")
+		fmt.Println(srcDir + " is not a path.")
+		return
 	}
+
+	srcPaths := make([]string, len(configFileNames))
+	for i, n := range configFileNames {
+		srcPaths[i] = filepath.Join(srcDir, n)
+		fmt.Printf("path: %s\n", srcPaths[i])
+	}
+
+	dstDir := filepath.Dir(*listFilePath)
+	dstPaths := make([]string, len(configFileNames))
+	for i, n := range configFileNames {
+		dstPaths[i] = filepath.Join(dstDir, n)
+		fmt.Printf("path: %s\n", dstPaths[i])
+	}
+
 }
 
 func getTemplate(listFilePath string) string {
