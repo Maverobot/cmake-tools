@@ -105,6 +105,16 @@ func main() {
 		}
 	}
 
+	// Add template to the given CMakeLists
+	f, err := os.OpenFile(*listFilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	if _, err = f.WriteString(newTemplate); err != nil {
+		panic(err)
+	}
+
 }
 
 func getTemplate(listFilePath string) string {
