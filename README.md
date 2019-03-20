@@ -10,7 +10,7 @@ sudo snap install go
 
 
 
-# Usage
+## Usage
 ```bash
 go get -u -v github.com/Maverobot/cmake-tools
 
