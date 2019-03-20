@@ -14,6 +14,7 @@ import (
 
 	prompt "github.com/c-bata/go-prompt"
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 	survey "gopkg.in/AlecAivazis/survey.v1"
 )
 
@@ -60,7 +61,7 @@ func main() {
 	d = color.New(color.FgWhite, color.Bold)
 	_, err = d.Printf("Please type the path to cmake-tools: \n")
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "color print failed"))
 	}
 
 	// Path autocompletion
@@ -101,7 +102,7 @@ func main() {
 			err = copyDir(src, dstPaths[i])
 		}
 		if err != nil {
-			panic(err)
+			panic(errors.Wrap(err, "copy failed"))
 		}
 	}
 
@@ -111,7 +112,7 @@ func getTemplate(listFilePath string) string {
 	// Read files into strings
 	contentList, err := ioutil.ReadFile(listFilePath)
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "read file failed"))
 	}
 
 	targets := make(chan []string)
@@ -180,14 +181,13 @@ func findLibraryNames(text string, names chan<- []string) {
 
 // findProjectName finds the name of project in CMakeLists.txt
 func findProjectName(text string, name chan<- string) {
-	targetMatch := string(` *project\((\w*)\)`)
+	targetMatch := string(` *project\((\w+)\)`)
 	r := regexp.MustCompile(targetMatch)
 	matches := r.FindAllStringSubmatch(text, -1)
-	if len(matches) > 1 {
-		name <- ""
-	} else if len(matches) < 1 {
+	if len(matches) != 1 {
 		name <- ""
 	}
+	// TODO: throw error if no matches are found
 	name <- matches[0][1]
 }
 
@@ -226,7 +226,7 @@ func findAllMatchDirs(path string, pattern string) []string {
 		return nil
 	})
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "file walk failed"))
 	}
 
 	dirs := make([]string, len(dirMap))
@@ -291,7 +291,7 @@ func userFilterOptions(name string, info string, src []string) []string {
 	question := createMultiSelectQuestion(name, info, src)
 	err := survey.Ask(question[:], &answers)
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "survey ask failed"))
 	}
 	return answers
 }
@@ -348,7 +348,7 @@ func createCompleter(textList []string) prompt.Completer {
 func getExecPath() string {
 	ex, err := os.Executable()
 	if err != nil {
-		panic(err)
+		panic(errors.Wrap(err, "get exec path failed"))
 	}
 	return filepath.Dir(ex)
 }
