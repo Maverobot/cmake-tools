@@ -100,6 +100,8 @@ func main() {
 			err = copyFile(src, dstPaths[i])
 		case dirPath:
 			err = copyDir(src, dstPaths[i])
+		case noPath:
+			panic(errors.Errorf("%s does not exist", src))
 		}
 		if err != nil {
 			panic(errors.Wrap(err, "copy failed"))
