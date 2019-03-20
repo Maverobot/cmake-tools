@@ -181,7 +181,7 @@ func findLibraryNames(text string, names chan<- []string) {
 
 // findProjectName finds the name of project in CMakeLists.txt
 func findProjectName(text string, name chan<- string) {
-	targetMatch := string(` *project\((\w+)\)`)
+	targetMatch := string(`\s*project\(((?:\w|-)*)\s*.*\)`)
 	r := regexp.MustCompile(targetMatch)
 	matches := r.FindAllStringSubmatch(text, -1)
 	if len(matches) != 1 {
