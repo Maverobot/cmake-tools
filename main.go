@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -43,7 +42,7 @@ const headerSnippetTemplate = `file(GLOB_RECURSE HEADERS
     $${GLOB_HEADERS}
   )`
 
-var configFileNames = [3]string{".clang-format", ".clang-tidy", "cmake/ClangTools.cmake"}
+var configFileNames = [3]string{".clang-format", ".clang-tidy", "cmake"}
 
 func main() {
 	listFilePath := flag.String("path", "", "path to a CMakeLists.txt file")
@@ -77,17 +76,33 @@ func main() {
 		return
 	}
 
+	// Paths of the files to be copied
 	srcPaths := make([]string, len(configFileNames))
 	for i, n := range configFileNames {
 		srcPaths[i] = filepath.Join(srcDir, n)
 		fmt.Printf("path: %s\n", srcPaths[i])
 	}
 
+	// Paths wherethe files to be copied to
 	dstDir := filepath.Dir(*listFilePath)
 	dstPaths := make([]string, len(configFileNames))
 	for i, n := range configFileNames {
 		dstPaths[i] = filepath.Join(dstDir, n)
 		fmt.Printf("path: %s\n", dstPaths[i])
+	}
+
+	for i, src := range srcPaths {
+		t := getPathType(src)
+		var err error
+		switch t {
+		case filePath:
+			err = copyFile(src, dstPaths[i])
+		case dirPath:
+			err = copyDir(src, dstPaths[i])
+		}
+		if err != nil {
+			panic(err)
+		}
 	}
 
 }
@@ -326,19 +341,6 @@ func getAbsPaths(root string, children []string) []string {
 		res[i] = filepath.Join(root, child)
 	}
 	return res
-}
-
-func copyAll(src, dst []string) error {
-	if len(src) != len(dst) {
-		return errors.New("src and dst must have same length")
-	}
-
-	for _, s := range src {
-		if !pathExists(s) {
-			return fmt.Errorf("%s does not exist", s)
-		}
-	}
-	return nil
 }
 
 // File copies a single file from src to dst
