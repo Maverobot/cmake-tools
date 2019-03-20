@@ -127,16 +127,18 @@ func getTemplate(listFilePath string) string {
 
 	// Find source folder paths
 	srcAbsDirs := findSourceDirs(rootDir)
-	srcAbsDirs = userFilterOptions("source filter", "Verify your source folder(s): \n", srcAbsDirs)
+	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
+	srcRelDirs = getUnique(srcRelDirs)
+	srcRelDirs = userFilterOptions("source filter", "Verify your source folder(s): \n", srcRelDirs)
 
 	// Find header folder paths
 	headerAbsDirs := findHeaderDirs(rootDir)
-	headerAbsDirs = userFilterOptions("header filter", "Verify your header folder(s): \n", headerAbsDirs)
+	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
+	headerRelDirs = getUnique(headerRelDirs)
+	headerRelDirs = userFilterOptions("header filter", "Verify your header folder(s): \n", headerRelDirs)
 
 	// Get source glob config
-	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
 	srcConfArray := getGlobConfArray(srcRelDirs, "cpp")
-	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
 	headerConfArray := getGlobConfArray(headerRelDirs, "h")
 
 	// Get source and header snippets
@@ -234,6 +236,22 @@ func findAllMatchDirs(path string, pattern string) []string {
 		i++
 	}
 	return dirs
+}
+
+func getUnique(src []string) []string {
+	uMap := make(map[string]struct{})
+	for _, v := range src {
+		if _, ok := uMap[v]; !ok {
+			uMap[v] = struct{}{}
+		}
+	}
+	uArr := make([]string, len(uMap))
+	i := 0
+	for key := range uMap {
+		uArr[i] = key
+		i++
+	}
+	return uArr
 }
 
 func getRootChildren(rootDir string, absDirs []string) []string {
