@@ -149,13 +149,13 @@ func getTemplate(listFilePath string) string {
 	if len(srcConfArray) != 0 {
 		sourceSnippet = replaceString(sourceSnippetTemplate,
 			`\$\{GLOB_SOURCES\}`,
-			strings.Join(srcConfArray, "\n    "))
+			strings.Join(srcConfArray, "\n    $$"))
 	}
 	headerSnippet := ""
 	if len(headerConfArray) != 0 {
 		headerSnippet = replaceString(headerSnippetTemplate,
 			`\$\{GLOB_HEADERS\}`,
-			strings.Join(headerConfArray, "\n    "))
+			strings.Join(headerConfArray, "\n    $$"))
 	}
 
 	output := replaceString(template, `\$\{GLOB_SOURCE_SNIPPET\}`, sourceSnippet)
