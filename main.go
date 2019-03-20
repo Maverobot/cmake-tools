@@ -68,7 +68,6 @@ func main() {
 	var options []string
 	options = append(options, getExecPath())
 	srcDir := prompt.Input("> ", createCompleter(options))
-	fmt.Println("You selected " + srcDir)
 
 	if _, err := os.Stat(srcDir); !os.IsNotExist(err) {
 		fmt.Println(srcDir + " is a path.")
@@ -81,7 +80,6 @@ func main() {
 	srcPaths := make([]string, len(configFileNames))
 	for i, n := range configFileNames {
 		srcPaths[i] = filepath.Join(srcDir, n)
-		fmt.Printf("path: %s\n", srcPaths[i])
 	}
 
 	// Paths wherethe files to be copied to
@@ -89,7 +87,6 @@ func main() {
 	dstPaths := make([]string, len(configFileNames))
 	for i, n := range configFileNames {
 		dstPaths[i] = filepath.Join(dstDir, n)
-		fmt.Printf("path: %s\n", dstPaths[i])
 	}
 
 	for i, src := range srcPaths {
