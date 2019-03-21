@@ -112,6 +112,10 @@ func main() {
 		panic(err)
 	}
 
+	fmt.Printf("The cmake tools have been successfully configured." +
+		"\n\tNow use \"-DCMAKE_EXPORT_COMPILE_COMMANDS=ON\" flag during cmake, " +
+		"and try with \"make format\" and \"make tidy\".\n")
+
 }
 
 func getTemplate(listFilePath string) string {
