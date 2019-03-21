@@ -53,7 +53,6 @@ func main() {
 		return
 	}
 	newTemplate := getTemplate(*listFilePath)
-	fmt.Print(newTemplate)
 
 	// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
 	d := color.New(color.FgGreen, color.Bold)
@@ -69,9 +68,7 @@ func main() {
 	options = append(options, getExecPath())
 	srcDir := prompt.Input("> ", createCompleter(options))
 
-	if _, err := os.Stat(srcDir); !os.IsNotExist(err) {
-		fmt.Println(srcDir + " is a path.")
-	} else {
+	if _, err := os.Stat(srcDir); os.IsNotExist(err) {
 		fmt.Println(srcDir + " is not a path.")
 		return
 	}
