@@ -10,3 +10,6 @@ go:
 
 script:
   - go build -o cmake-tools main.go
+
+after_success:
+  - ./appimage/appimage.sh
