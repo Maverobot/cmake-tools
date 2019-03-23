@@ -9,6 +9,7 @@
 set -e
 
 export ARCH="$(arch)"
+export VERSION="0.01"
 
 APP=cmake-tools
 LOWERAPP=${APP,,}
@@ -56,12 +57,6 @@ copy_deps
 ########################################################################
 
 get_desktopintegration $LOWERAPP
-
-########################################################################
-# Determine the version of the app; also include needed glibc version
-########################################################################
-
-VERSION="0.01"
 
 ########################################################################
 # Patch away absolute paths; it would be nice if they were relative
