@@ -9,7 +9,7 @@
 set -e
 
 export ARCH="$(arch)"
-export VERSION="0.01"
+export VERSION="v0.0.1"
 
 APP=cmake-tools
 LOWERAPP=${APP,,}
