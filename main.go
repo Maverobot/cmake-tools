@@ -47,6 +47,7 @@ var configFileNames = [3]string{".clang-format", ".clang-tidy", "cmake"}
 
 func main() {
 	listFilePath := flag.String("path", "", "path to a CMakeLists.txt file")
+	useCustomClangConfig := flag.Bool("v", false, "Use custom clang config.")
 	flag.Parse()
 	if len(os.Args) < 2 || len(*listFilePath) == 0 {
 		flag.Usage()
@@ -54,23 +55,28 @@ func main() {
 	}
 	newTemplate := getTemplate(*listFilePath)
 
-	// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
-	d := color.New(color.FgGreen, color.Bold)
-	_, err := d.Printf("? ")
-	d = color.New(color.FgWhite, color.Bold)
-	_, err = d.Printf("Please type the path to cmake-tools: \n")
-	if err != nil {
-		panic(errors.Wrap(err, "color print failed"))
-	}
+	var srcDir string
+	if *useCustomClangConfig {
+		// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
+		d := color.New(color.FgGreen, color.Bold)
+		_, err := d.Printf("? ")
+		d = color.New(color.FgWhite, color.Bold)
+		_, err = d.Printf("Please type the path to cmake-tools: \n")
+		if err != nil {
+			panic(errors.Wrap(err, "color print failed"))
+		}
 
-	// Path autocompletion
-	var options []string
-	options = append(options, getExecPath())
-	srcDir := prompt.Input("> ", createCompleter(options))
+		// Path autocompletion
+		var options []string
+		options = append(options, getExecPath())
+		srcDir = prompt.Input("> ", createCompleter(options))
 
-	if _, err := os.Stat(srcDir); os.IsNotExist(err) {
-		fmt.Println(srcDir + " is not a path.")
-		return
+		if _, err := os.Stat(srcDir); os.IsNotExist(err) {
+			fmt.Println(srcDir + " is not a path.")
+			return
+		}
+	} else {
+		srcDir = getExecPath()
 	}
 
 	// Paths of the files to be copied
@@ -112,7 +118,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("The cmake tools have been successfully configured." +
+	fmt.Printf("\nThe cmake tools have been successfully configured." +
 		"\n\tNow use \"-DCMAKE_EXPORT_COMPILE_COMMANDS=ON\" flag during cmake, " +
 		"and try with \"make format\" and \"make tidy\".\n")
 
