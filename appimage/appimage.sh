@@ -61,10 +61,3 @@ cd .. # Go out of AppImage
 
 mkdir -p ../out/
 generate_type2_appimage
-
-########################################################################
-# Upload the AppDir
-########################################################################
-
-transfer ../out/*
-echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
