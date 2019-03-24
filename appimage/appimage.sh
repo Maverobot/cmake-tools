@@ -31,19 +31,11 @@ cp "${BUILD_PATH}/.clang-tidy" .
 cp "${BUILD_PATH}/${LOWERAPP}" "AppRun"
 
 ########################################################################
-# Copy desktop and icon file to AppDir for AppRun to pick them up
-########################################################################
-
-cp "${BUILD_PATH}/appimage/${LOWERAPP}.desktop" .
-cp "${BUILD_PATH}/appimage/${LOWERAPP}.png" .
-
-########################################################################
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
 ########################################################################
 
 copy_deps
-
 
 ########################################################################
 # Patch away absolute paths; it would be nice if they were relative

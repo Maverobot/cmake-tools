@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=cmake-tools
-Exec=cmake-tools
-Icon=cmake-tools
-Type=Application
-Categories=Utility;
-X-AppImage-Version=.glibc2.3.3
