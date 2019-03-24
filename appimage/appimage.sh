@@ -25,10 +25,10 @@ wget -q https://github.com/probonopd/AppImages/raw/master/functions.sh -O ./func
 
 cd $APP.AppDir
 
-cp "${BUILD_PATH}/${LOWERAPP}" ./usr/bin
-cp -r "${BUILD_PATH}/cmake" ./usr/bin
-cp "${BUILD_PATH}/.clang-format" ./usr/bin
-cp "${BUILD_PATH}/.clang-tidy" ./usr/bin
+cp -r "${BUILD_PATH}/cmake" .
+cp "${BUILD_PATH}/.clang-format" .
+cp "${BUILD_PATH}/.clang-tidy" .
+cp "${BUILD_PATH}/${LOWERAPP}" "AppRun"
 
 ########################################################################
 # Copy desktop and icon file to AppDir for AppRun to pick them up
@@ -38,25 +38,12 @@ cp "${BUILD_PATH}/appimage/${LOWERAPP}.desktop" .
 cp "${BUILD_PATH}/appimage/${LOWERAPP}.png" .
 
 ########################################################################
-# Other appliaction-specific finishing touches
-########################################################################
-
-# Bundle Python and all the plugins needed
-
-cd ..
-
-########################################################################
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
 ########################################################################
 
 copy_deps
 
-########################################################################
-# desktopintegration asks the user on first run to install a menu item
-########################################################################
-
-get_desktopintegration $LOWERAPP
 
 ########################################################################
 # Patch away absolute paths; it would be nice if they were relative
