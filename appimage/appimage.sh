@@ -68,5 +68,3 @@ generate_type2_appimage
 
 transfer ../out/*
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
-
-mv ../out/* "${BUILD_PATH}"
