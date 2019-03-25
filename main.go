@@ -14,6 +14,7 @@ import (
 
 	prompt "github.com/c-bata/go-prompt"
 	"github.com/fatih/color"
+	"github.com/mbndr/figlet4go"
 	"github.com/pkg/errors"
 	survey "gopkg.in/AlecAivazis/survey.v1"
 )
@@ -53,6 +54,10 @@ func main() {
 		flag.Usage()
 		return
 	}
+
+	// figlet fun
+	figletFromString("cmake-tools")
+
 	newTemplate := getTemplate(*listFilePath)
 
 	var srcDir string
@@ -464,4 +469,18 @@ func getPathType(path string) pathType {
 		return filePath
 	}
 	return noPath
+}
+
+func figletFromString(src string) {
+	ascii := figlet4go.NewAsciiRender()
+	options := figlet4go.NewRenderOptions()
+
+	options.FontColor = []figlet4go.Color{
+		// Colors can be given by default ansi color codes...
+		figlet4go.ColorGreen,
+	}
+
+	// The underscore would be an error
+	renderStr, _ := ascii.RenderOpts(src, options)
+	fmt.Print(renderStr)
 }
