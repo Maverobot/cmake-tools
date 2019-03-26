@@ -8,7 +8,8 @@ This package provides automatic configuration of following tools for cmake proje
 sudo snap install go
 ```
 
-## Out of box with AppImage
+## Usage
+### Out of box with AppImage
 ```bash
 wget https://github.com/Maverobot/cmake-tools/releases/download/continuous/cmake-tools-v0.0.1.glibc2.3.3-x86_64.AppImage -O cmake-tools.AppImage
 chmod +x cmake-tools.AppImage
@@ -16,7 +17,7 @@ chmod +x cmake-tools.AppImage
 ```
 
 
-## Compilation and Usage with Go
+### Compilation
 ```bash
 go get -u -v github.com/Maverobot/cmake-tools
 
