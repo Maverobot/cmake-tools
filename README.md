@@ -3,13 +3,9 @@ This package provides automatic configuration of following tools for cmake proje
 * clang-format
 * clang-tidy
 
-## Prerequisite
-```bash
-sudo snap install go
-```
-
 ## Usage
 ### Out of box with AppImage
+This method requires **no dependencies**!
 ```bash
 wget https://github.com/Maverobot/cmake-tools/releases/download/continuous/cmake-tools-v0.0.1.glibc2.3.3-x86_64.AppImage -O cmake-tools.AppImage
 chmod +x cmake-tools.AppImage
@@ -18,6 +14,14 @@ chmod +x cmake-tools.AppImage
 
 
 ### Compilation
+
+#### Prerequisite
+```bash
+sudo snap install go
+```
+
+#### Download, compile and use
+
 ```bash
 go get -u -v github.com/Maverobot/cmake-tools
 
