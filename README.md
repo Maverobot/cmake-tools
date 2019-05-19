@@ -1,7 +1,10 @@
 # cmake-tools
+
 This package provides automatic configuration of following tools for cmake project:
 * clang-format
 * clang-tidy
+
+This project was mainly used for learning Go language, travis and AppImage.
 
 **No dependency** is needed for running this tool with AppImage.
 
