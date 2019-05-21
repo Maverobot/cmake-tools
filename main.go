@@ -31,7 +31,7 @@ if(CLANG_TOOLS)
   ${GLOB_HEADER_SNIPPET}
   add_format_target(${PROJECT_NAME} FILES ${SOURCES} ${HEADERS})
   add_tidy_target(${PROJECT_NAME}
-    FILES ${SOURCES} ${HEADERS}
+    FILES ${SOURCES}
     DEPENDS ${TARGETS}
   )
 endif()
