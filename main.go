@@ -157,7 +157,9 @@ func getTemplate(listFilePath string) string {
 	headerAbsDirs := findHeaderDirs(rootDir)
 	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
 	headerRelDirs = getUnique(headerRelDirs)
-	headerRelDirs = userFilterOptions("header filter", "Verify your header folder(s): \n", headerRelDirs)
+	if len(headerRelDirs) != 0 {
+		headerRelDirs = userFilterOptions("header filter", "Verify your header folder(s): \n", headerRelDirs)
+	}
 
 	// Get source glob config
 	srcConfArray := getGlobConfArray(srcRelDirs, "cpp")
