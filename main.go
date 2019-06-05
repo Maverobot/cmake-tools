@@ -3,11 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -17,6 +15,8 @@ import (
 	"github.com/mbndr/figlet4go"
 	"github.com/pkg/errors"
 	survey "gopkg.in/AlecAivazis/survey.v1"
+
+	cmakego "github.com/Maverobot/cmake-tools/src"
 )
 
 const startSize = 8
@@ -73,7 +73,7 @@ func main() {
 
 		// Path autocompletion
 		var options []string
-		options = append(options, getExecPath())
+		options = append(options, cmakego.GetExecPath())
 		srcDir = prompt.Input("> ", createCompleter(options))
 
 		if _, err := os.Stat(srcDir); os.IsNotExist(err) {
@@ -81,7 +81,7 @@ func main() {
 			return
 		}
 	} else {
-		srcDir = getExecPath()
+		srcDir = cmakego.GetExecPath()
 	}
 
 	// Paths of the files to be copied
@@ -98,14 +98,14 @@ func main() {
 	}
 
 	for i, src := range srcPaths {
-		t := getPathType(src)
+		t := cmakego.GetPathType(src)
 		var err error
 		switch t {
-		case filePath:
-			err = copyFile(src, dstPaths[i])
-		case dirPath:
-			err = copyDir(src, dstPaths[i])
-		case noPath:
+		case cmakego.FilePath:
+			err = cmakego.CopyFile(src, dstPaths[i])
+		case cmakego.DirPath:
+			err = cmakego.CopyDir(src, dstPaths[i])
+		case cmakego.NoPath:
 			panic(errors.Errorf("%s does not exist", src))
 		}
 		if err != nil {
@@ -366,111 +366,6 @@ func createCompleter(textList []string) prompt.Completer {
 	}
 
 	return completer
-}
-
-func getExecPath() string {
-	ex, err := os.Executable()
-	if err != nil {
-		panic(errors.Wrap(err, "get exec path failed"))
-	}
-	return filepath.Dir(ex)
-}
-
-func getAbsPaths(root string, children []string) []string {
-	res := make([]string, len(children))
-	for i, child := range children {
-		res[i] = filepath.Join(root, child)
-	}
-	return res
-}
-
-// File copies a single file from src to dst
-func copyFile(src, dst string) error {
-	var err error
-	var srcfd *os.File
-	var dstfd *os.File
-	var srcinfo os.FileInfo
-
-	if srcfd, err = os.Open(src); err != nil {
-		return err
-	}
-	defer srcfd.Close()
-
-	if dstfd, err = os.Create(dst); err != nil {
-		return err
-	}
-	defer dstfd.Close()
-
-	if _, err = io.Copy(dstfd, srcfd); err != nil {
-		return err
-	}
-	if srcinfo, err = os.Stat(src); err != nil {
-		return err
-	}
-	return os.Chmod(dst, srcinfo.Mode())
-}
-
-// Dir copies a whole directory recursively
-func copyDir(src string, dst string) error {
-	var err error
-	var fds []os.FileInfo
-	var srcinfo os.FileInfo
-
-	if srcinfo, err = os.Stat(src); err != nil {
-		return err
-	}
-
-	if err = os.MkdirAll(dst, srcinfo.Mode()); err != nil {
-		return err
-	}
-
-	if fds, err = ioutil.ReadDir(src); err != nil {
-		return err
-	}
-	for _, fd := range fds {
-		srcfp := path.Join(src, fd.Name())
-		dstfp := path.Join(dst, fd.Name())
-
-		if fd.IsDir() {
-			if err = copyDir(srcfp, dstfp); err != nil {
-				fmt.Println(err)
-			}
-		} else {
-			if err = copyFile(srcfp, dstfp); err != nil {
-				fmt.Println(err)
-			}
-		}
-	}
-	return nil
-}
-
-func pathExists(path string) bool {
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		return true
-	}
-	return false
-}
-
-type pathType int
-
-const (
-	filePath pathType = iota
-	dirPath
-	noPath
-)
-
-func getPathType(path string) pathType {
-	fi, err := os.Stat(path)
-	if err != nil {
-		return noPath
-	}
-	switch mode := fi.Mode(); {
-	case mode.IsDir():
-		return dirPath
-	case mode.IsRegular():
-		return filePath
-	}
-	return noPath
 }
 
 func figletFromString(src string) {
