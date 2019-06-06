@@ -1,4 +1,5 @@
 # cmake-tools
+[![Build Status](https://travis-ci.com/Maverobot/cmake-tools.svg?branch=master)](https://travis-ci.com/Maverobot/cmake-tools)
 
 This package provides automatic configuration of following tools for cmake project:
 * clang-format
