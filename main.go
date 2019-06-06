@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 	survey "gopkg.in/AlecAivazis/survey.v1"
 
-	cmakego "github.com/Maverobot/cmake-tools/src"
+	cmakego "github.com/maverobot/cmake-tools/src"
 )
 
 const startSize = 8
