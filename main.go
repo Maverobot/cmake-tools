@@ -19,8 +19,6 @@ import (
 	cmakego "github.com/maverobot/cmake-tools/src"
 )
 
-const startSize = 8
-
 const template = `
 ## ClangTools
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/ClangTools.cmake OPTIONAL
@@ -195,6 +193,7 @@ func getTemplate(listFilePath string) string {
 // findLibraryNames finds the names of libraries and executables defined
 // by add_library and add_executable
 func findLibraryNames(text string, names chan<- []string) {
+	const startSize = 8
 	libNames := make([]string, 0, startSize)
 	targetMatch := string(` *add_(?:library|executable)\( *(\w*)`)
 	r := regexp.MustCompile(targetMatch)
