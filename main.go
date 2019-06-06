@@ -75,7 +75,7 @@ func main() {
 		// Path autocompletion
 		var options []string
 		options = append(options, cmakego.GetExecPath())
-		srcDir = prompt.Input("> ", createCompleter(options))
+		srcDir = prompt.Input("> ", cmakego.CreatePathCompleter(options))
 
 		if _, err := os.Stat(srcDir); os.IsNotExist(err) {
 			fmt.Println(srcDir + " is not a path.")
@@ -319,55 +319,6 @@ func userFilterOptions(name string, info string, src []string) []string {
 		panic(errors.Wrap(err, "survey ask failed"))
 	}
 	return answers
-}
-
-func getSuggestionsPath(path string) []string {
-	// remove the letters after and inclusive the last "/"
-	var re = regexp.MustCompile(`\w*$`)
-	path = re.ReplaceAllString(path, ``)
-
-	info, err := os.Stat(path)
-	if err != nil {
-		return []string{}
-	}
-
-	var children []string
-	if info.IsDir() {
-		files, err := ioutil.ReadDir(path)
-		if err != nil {
-			return []string{}
-		}
-		// Strip "/" at the end of path
-		if strings.HasSuffix(path, "/") {
-			path = path[0 : len(path)-1]
-		}
-
-		for _, file := range files {
-			children = append(children, path+"/"+file.Name())
-		}
-	}
-
-	return children
-}
-
-func createCompleter(textList []string) prompt.Completer {
-
-	completer := func(d prompt.Document) []prompt.Suggest {
-		var s []prompt.Suggest
-		for _, value := range textList {
-			s = append(s, prompt.Suggest{Text: value, Description: ""})
-		}
-
-		children := getSuggestionsPath(d.GetWordBeforeCursor())
-
-		for _, value := range children {
-			s = append(s, prompt.Suggest{Text: value, Description: ""})
-		}
-
-		return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
-	}
-
-	return completer
 }
 
 func figletFromString(src string) {
