@@ -65,6 +65,9 @@ func main() {
 		// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
 		d := color.New(color.FgGreen, color.Bold)
 		_, err := d.Printf("? ")
+		if err != nil {
+			panic(errors.Wrap(err, "color print failed"))
+		}
 		d = color.New(color.FgWhite, color.Bold)
 		_, err = d.Printf("Please type the path to cmake-tools: \n")
 		if err != nil {
@@ -378,6 +381,9 @@ func figletFromString(src string) {
 	}
 
 	// The underscore would be an error
-	renderStr, _ := ascii.RenderOpts(src, options)
+	renderStr, err := ascii.RenderOpts(src, options)
+	if err != nil {
+		panic(errors.Wrap(err, "figlet rendering failed"))
+	}
 	fmt.Print(renderStr)
 }
