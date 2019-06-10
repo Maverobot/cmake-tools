@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// GetExecPath returns the path where the binary was executed
 func GetExecPath() string {
 	ex, err := os.Executable()
 	if err != nil {
@@ -19,6 +20,7 @@ func GetExecPath() string {
 	return filepath.Dir(ex)
 }
 
+// GetAbsPaths returns the absolute paths of relative paths given root path
 func GetAbsPaths(root string, children []string) []string {
 	res := make([]string, len(children))
 	for i, child := range children {
@@ -27,7 +29,7 @@ func GetAbsPaths(root string, children []string) []string {
 	return res
 }
 
-// File copies a single file from src to dst
+// CopyFile copies a single file from src to dst
 func CopyFile(src, dst string) error {
 	var err error
 	var srcfd *os.File
@@ -53,7 +55,7 @@ func CopyFile(src, dst string) error {
 	return os.Chmod(dst, srcinfo.Mode())
 }
 
-// Dir copies a whole directory recursively
+// CopyDir copies a whole directory recursively
 func CopyDir(src string, dst string) error {
 	var err error
 	var fds []os.FileInfo
@@ -87,6 +89,7 @@ func CopyDir(src string, dst string) error {
 	return nil
 }
 
+// PathExists checks if a given path exists
 func PathExists(path string) bool {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		return true
@@ -94,14 +97,19 @@ func PathExists(path string) bool {
 	return false
 }
 
+// PathType define types of of path using int
 type PathType int
 
 const (
+	// FilePath indicates the path is for a file
 	FilePath PathType = iota
+	// DirPath indicates the path is for a directory
 	DirPath
+	// NoPath indicates the path does not exist
 	NoPath
 )
 
+// GetPathType returns type of path given a string of the path
 func GetPathType(path string) PathType {
 	fi, err := os.Stat(path)
 	if err != nil {
