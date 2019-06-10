@@ -19,31 +19,6 @@ import (
 	cmakego "github.com/maverobot/cmake-tools/src"
 )
 
-const template = `
-## ClangTools
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/ClangTools.cmake OPTIONAL
-  RESULT_VARIABLE CLANG_TOOLS
-)
-if(CLANG_TOOLS)
-  ${GLOB_SOURCE_SNIPPET}
-  ${GLOB_HEADER_SNIPPET}
-  add_format_target(${PROJECT_NAME} FILES ${SOURCES} ${HEADERS})
-  add_tidy_target(${PROJECT_NAME}
-    FILES ${SOURCES}
-    DEPENDS ${TARGETS}
-  )
-endif()
-`
-
-const sourceSnippetTemplate = `file(GLOB_RECURSE SOURCES
-    $${GLOB_SOURCES}
-  )`
-const headerSnippetTemplate = `file(GLOB_RECURSE HEADERS
-    $${GLOB_HEADERS}
-  )`
-
-var configFileNames = [3]string{".clang-format", ".clang-tidy", "cmake"}
-
 func main() {
 	listFilePath := flag.String("path", "", "path to a CMakeLists.txt file")
 	useCustomClangConfig := flag.Bool("v", false, "Use custom clang config.")
@@ -86,15 +61,15 @@ func main() {
 	}
 
 	// Paths of the files to be copied
-	srcPaths := make([]string, len(configFileNames))
-	for i, n := range configFileNames {
+	srcPaths := make([]string, len(cmakego.ConfigFileNames))
+	for i, n := range cmakego.ConfigFileNames {
 		srcPaths[i] = filepath.Join(srcDir, n)
 	}
 
 	// Paths wherethe files to be copied to
 	dstDir := filepath.Dir(*listFilePath)
-	dstPaths := make([]string, len(configFileNames))
-	for i, n := range configFileNames {
+	dstPaths := make([]string, len(cmakego.ConfigFileNames))
+	for i, n := range cmakego.ConfigFileNames {
 		dstPaths[i] = filepath.Join(dstDir, n)
 	}
 
@@ -169,18 +144,18 @@ func getTemplate(listFilePath string) string {
 	// Get source and header snippets
 	sourceSnippet := ""
 	if len(srcConfArray) != 0 {
-		sourceSnippet = replaceString(sourceSnippetTemplate,
+		sourceSnippet = replaceString(cmakego.SourceSnippetTemplate,
 			`\$\{GLOB_SOURCES\}`,
 			strings.Join(srcConfArray, "\n    $$"))
 	}
 	headerSnippet := ""
 	if len(headerConfArray) != 0 {
-		headerSnippet = replaceString(headerSnippetTemplate,
+		headerSnippet = replaceString(cmakego.HeaderSnippetTemplate,
 			`\$\{GLOB_HEADERS\}`,
 			strings.Join(headerConfArray, "\n    $$"))
 	}
 
-	output := replaceString(template, `\$\{GLOB_SOURCE_SNIPPET\}`, sourceSnippet)
+	output := replaceString(cmakego.ClangConfigTemplate, `\$\{GLOB_SOURCE_SNIPPET\}`, sourceSnippet)
 	output = replaceString(output, `\$\{GLOB_HEADER_SNIPPET\}`, headerSnippet)
 
 	// Puts project name into output
