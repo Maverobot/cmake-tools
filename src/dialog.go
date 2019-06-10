@@ -18,8 +18,7 @@ func createMultiSelectQuestion(name string, message string, options []string) []
 	}
 }
 
-// UserFilterOptions shows the user a few options and return the chosen ones.
-func UserFilterOptions(name string, info string, src []string) []string {
+func userFilterOptions(name string, info string, src []string) []string {
 	answers := []string{}
 	question := createMultiSelectQuestion(name, info, src)
 	err := survey.Ask(question[:], &answers)

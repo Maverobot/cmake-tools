@@ -11,6 +11,43 @@ import (
 	"github.com/pkg/errors"
 )
 
+// CopyConfigFiles copies the config files and directories to the target cmake project
+func CopyConfigFiles(srcDir string, listFilePath string) {
+	// Paths of the files to be copied
+	srcPaths := make([]string, len(configFileNames))
+	for i, n := range configFileNames {
+		srcPaths[i] = filepath.Join(srcDir, n)
+	}
+
+	// Paths wherethe files to be copied to
+	dstDir := filepath.Dir(listFilePath)
+	dstPaths := make([]string, len(configFileNames))
+	for i, n := range configFileNames {
+		dstPaths[i] = filepath.Join(dstDir, n)
+	}
+
+	for i, src := range srcPaths {
+		t := getPathType(src)
+		var err error
+		switch t {
+		case filePath:
+			err = CopyFile(src, dstPaths[i])
+		case DirPath:
+			err = CopyDir(src, dstPaths[i])
+		case NoPath:
+			panic(errors.Errorf("%s does not exist", src))
+		}
+		if err != nil {
+			panic(errors.Wrap(err, "copy failed"))
+		}
+	}
+
+}
+
+func AddConfigToCMakeLists() {
+
+}
+
 // GetExecPath returns the path where the binary was executed
 func GetExecPath() string {
 	ex, err := os.Executable()
@@ -101,16 +138,16 @@ func PathExists(path string) bool {
 type PathType int
 
 const (
-	// FilePath indicates the path is for a file
-	FilePath PathType = iota
+	// filePath indicates the path is for a file
+	filePath PathType = iota
 	// DirPath indicates the path is for a directory
 	DirPath
 	// NoPath indicates the path does not exist
 	NoPath
 )
 
-// GetPathType returns type of path given a string of the path
-func GetPathType(path string) PathType {
+// getPathType returns type of path given a string of the path
+func getPathType(path string) PathType {
 	fi, err := os.Stat(path)
 	if err != nil {
 		return NoPath
@@ -119,7 +156,7 @@ func GetPathType(path string) PathType {
 	case mode.IsDir():
 		return DirPath
 	case mode.IsRegular():
-		return FilePath
+		return filePath
 	}
 	return NoPath
 }
