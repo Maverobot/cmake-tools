@@ -36,7 +36,7 @@ func CopyFile(src, dst string) error {
 	var dstfd *os.File
 	var srcinfo os.FileInfo
 
-	if srcfd, err = os.Open(src); err != nil {
+	if srcfd, err = os.Open(filepath.Clean(src)); err != nil {
 		return err
 	}
 	defer srcfd.Close()

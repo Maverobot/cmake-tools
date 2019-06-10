@@ -107,7 +107,7 @@ func main() {
 
 func getTemplate(listFilePath string) string {
 	// Read files into strings
-	contentList, err := ioutil.ReadFile(listFilePath)
+	contentList, err := ioutil.ReadFile(filepath.Clean(listFilePath))
 	if err != nil {
 		panic(errors.Wrap(err, "read file failed"))
 	}
