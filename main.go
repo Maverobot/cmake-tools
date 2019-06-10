@@ -28,7 +28,7 @@ func main() {
 	// get the config text for CMakeLists.txt
 	newTemplate := cmakego.GetTemplate(*listFilePath)
 
-	// copy necessary files to the target cmake project
+	// determine where to get the config files
 	var srcDir string
 	if *useCustomClangConfig {
 		// Ask for a directory to find cmake/ClangTools.cmake, .clang-format and .clang-tidy
@@ -56,6 +56,7 @@ func main() {
 		srcDir = cmakego.GetExecPath()
 	}
 
+	// copy necessary files to the target cmake project
 	cmakego.CopyConfigFiles(srcDir, *listFilePath)
 
 	// Add template to the given CMakeLists
