@@ -44,10 +44,6 @@ func CopyConfigFiles(srcDir string, listFilePath string) {
 
 }
 
-func AddConfigToCMakeLists() {
-
-}
-
 // GetExecPath returns the path where the binary was executed
 func GetExecPath() string {
 	ex, err := os.Executable()
