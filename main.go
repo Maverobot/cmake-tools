@@ -14,7 +14,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/mbndr/figlet4go"
 	"github.com/pkg/errors"
-	survey "gopkg.in/AlecAivazis/survey.v1"
 
 	cmakego "github.com/maverobot/cmake-tools/src"
 )
@@ -127,14 +126,14 @@ func getTemplate(listFilePath string) string {
 	srcAbsDirs := findSourceDirs(rootDir)
 	srcRelDirs := getRootChildren(rootDir, srcAbsDirs)
 	srcRelDirs = getUnique(srcRelDirs)
-	srcRelDirs = userFilterOptions("source filter", "Verify your source folder(s): \n", srcRelDirs)
+	srcRelDirs = cmakego.UserFilterOptions("source filter", "Verify your source folder(s): \n", srcRelDirs)
 
 	// Find header folder paths
 	headerAbsDirs := findHeaderDirs(rootDir)
 	headerRelDirs := getRootChildren(rootDir, headerAbsDirs)
 	headerRelDirs = getUnique(headerRelDirs)
 	if len(headerRelDirs) != 0 {
-		headerRelDirs = userFilterOptions("header filter", "Verify your header folder(s): \n", headerRelDirs)
+		headerRelDirs = cmakego.UserFilterOptions("header filter", "Verify your header folder(s): \n", headerRelDirs)
 	}
 
 	// Get source glob config
@@ -271,29 +270,6 @@ func getGlobConfArray(folderNames []string, ext string) []string {
 		conf[i] = fmt.Sprintf(template, v, ext)
 	}
 	return conf
-}
-
-func createMultiSelectQuestion(name string, message string, options []string) []*survey.Question {
-	return []*survey.Question{
-		{
-			Name: name,
-			Prompt: &survey.MultiSelect{
-				Message: message,
-				Options: options,
-				Default: options,
-			},
-		},
-	}
-}
-
-func userFilterOptions(name string, info string, src []string) []string {
-	answers := []string{}
-	question := createMultiSelectQuestion(name, info, src)
-	err := survey.Ask(question[:], &answers)
-	if err != nil {
-		panic(errors.Wrap(err, "survey ask failed"))
-	}
-	return answers
 }
 
 func figletFromString(src string) {
